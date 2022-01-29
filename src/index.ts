@@ -1,12 +1,14 @@
 import "reflect-metadata";
+import 'dotenv/config';
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import cors from "cors";
 import { buildSchema } from "type-graphql";
 import { ProjectResolver } from "./resolvers/project";
+import connectDB from './config/db.js';
 
 const main = async () => {
-    const app = express();
+    const app = express();    
 
     app.use(
         cors({
@@ -29,7 +31,9 @@ const main = async () => {
         cors: false,
     });
 
-    app.listen(4000, () => {
+    connectDB();
+
+    app.listen(process.env.PORT, () => {
         console.log("Server started on PORT 4000");
     });
 };
