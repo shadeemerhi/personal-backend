@@ -11,6 +11,8 @@ const cors_1 = __importDefault(require("cors"));
 const type_graphql_1 = require("type-graphql");
 const project_1 = require("./resolvers/project");
 const db_js_1 = __importDefault(require("./config/db.js"));
+const project_2 = require("./entities/project");
+const uuid_1 = require("uuid");
 const main = async () => {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
@@ -29,7 +31,11 @@ const main = async () => {
         app,
         cors: false,
     });
-    (0, db_js_1.default)();
+    await (0, db_js_1.default)();
+    const { _id } = await project_2.ProjectModel.create({
+        _id: (0, uuid_1.v4)(),
+        title: "Shadee New Project",
+    });
     app.listen(process.env.PORT, () => {
         console.log("Server started on PORT 4000");
     });

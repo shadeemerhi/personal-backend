@@ -9,22 +9,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectResolver = void 0;
+exports.ProjectModel = exports.Project = void 0;
+const typegoose_1 = require("@typegoose/typegoose");
 const type_graphql_1 = require("type-graphql");
-const project_1 = require("../entities/project");
-let ProjectResolver = class ProjectResolver {
-    async test() {
-        return await project_1.ProjectModel.findOne({ title: "Shadee New Project" });
-    }
+let Project = class Project {
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => project_1.Project),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ProjectResolver.prototype, "test", null);
-ProjectResolver = __decorate([
-    (0, type_graphql_1.Resolver)()
-], ProjectResolver);
-exports.ProjectResolver = ProjectResolver;
+    (0, type_graphql_1.Field)(() => String),
+    (0, typegoose_1.prop)(),
+    __metadata("design:type", String)
+], Project.prototype, "_id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    (0, typegoose_1.prop)(),
+    __metadata("design:type", String)
+], Project.prototype, "title", void 0);
+Project = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], Project);
+exports.Project = Project;
+exports.ProjectModel = (0, typegoose_1.getModelForClass)(Project);
 //# sourceMappingURL=project.js.map

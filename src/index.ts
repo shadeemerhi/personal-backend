@@ -1,14 +1,16 @@
 import "reflect-metadata";
-import 'dotenv/config';
+import "dotenv/config";
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import cors from "cors";
 import { buildSchema } from "type-graphql";
 import { ProjectResolver } from "./resolvers/project";
-import connectDB from './config/db.js';
+import connectDB from "./config/db.js";
+import { ProjectModel } from "./entities/project";
+import { v4 } from 'uuid';
 
 const main = async () => {
-    const app = express();    
+    const app = express();
 
     app.use(
         cors({
@@ -31,7 +33,12 @@ const main = async () => {
         cors: false,
     });
 
-    connectDB();
+    await connectDB();
+
+    const { _id } = await ProjectModel.create({
+        _id: v4(),
+        title: "Shadee New Project",
+    });
 
     app.listen(process.env.PORT, () => {
         console.log("Server started on PORT 4000");
