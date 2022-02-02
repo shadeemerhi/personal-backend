@@ -35,11 +35,6 @@ const main = async () => {
 
     await connectDB();
 
-    const { _id } = await ProjectModel.create({
-        _id: v4(),
-        title: "Shadee New Project",
-    });
-
     app.listen(process.env.PORT, () => {
         console.log("Server started on PORT 4000");
     });
