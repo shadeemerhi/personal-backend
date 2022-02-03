@@ -6,38 +6,41 @@ import cors from "cors";
 import { buildSchema } from "type-graphql";
 import { ProjectResolver } from "./resolvers/project";
 import connectDB from "./config/db.js";
-import { ProjectModel } from "./entities/project";
-import { v4 } from 'uuid';
+import { graphqlUploadExpress } from 'graphql-upload'
 
 const main = async () => {
-    const app = express();
+  const app = express();
 
-    app.use(
-        cors({
-            origin: "http://localhost:3000",
-            credentials: true,
-        })
-    );
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
+  
 
-    const apolloServer = new ApolloServer({
-        schema: await buildSchema({
-            resolvers: [ProjectResolver],
-            validate: false,
-        }),
-        context: ({}): any => ({}),
-    });
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [ProjectResolver],
+      validate: false,
+    }),
+    context: ({}): any => ({}),
+    uploads: false,
+  });
 
-    await apolloServer.start();
-    apolloServer.applyMiddleware({
-        app,
-        cors: false,
-    });
+  app.use(graphqlUploadExpress());
 
-    await connectDB();
+  await apolloServer.start();
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
-    app.listen(process.env.PORT, () => {
-        console.log("Server started on PORT 4000");
-    });
+  await connectDB();
+
+  app.listen(process.env.PORT, () => {
+    console.log("Server started on PORT 4000");
+  });
 };
 
 main().catch((err) => console.log(err));

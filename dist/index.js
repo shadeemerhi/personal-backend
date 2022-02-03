@@ -11,6 +11,7 @@ const cors_1 = __importDefault(require("cors"));
 const type_graphql_1 = require("type-graphql");
 const project_1 = require("./resolvers/project");
 const db_js_1 = __importDefault(require("./config/db.js"));
+const graphql_upload_1 = require("graphql-upload");
 const main = async () => {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
@@ -23,7 +24,9 @@ const main = async () => {
             validate: false,
         }),
         context: ({}) => ({}),
+        uploads: false,
     });
+    app.use((0, graphql_upload_1.graphqlUploadExpress)());
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,

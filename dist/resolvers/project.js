@@ -14,7 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectResolver = void 0;
 const type_graphql_1 = require("type-graphql");
+const graphql_upload_1 = require("graphql-upload");
 const project_1 = require("../entities/project");
+const fs_1 = require("fs");
 let ProjectResolver = class ProjectResolver {
     async project(id) {
         return await project_1.ProjectModel.findOne({ id });
@@ -22,10 +24,21 @@ let ProjectResolver = class ProjectResolver {
     async projects() {
         return await project_1.ProjectModel.find();
     }
+    async createProject(file, name) {
+        console.log("HERE ARE THE ARGS", file, name);
+        const { createReadStream, filename } = file;
+        return new Promise(async (resolve, reject) => createReadStream()
+            .pipe((0, fs_1.createWriteStream)(__dirname + `/../../images/${filename}`))
+            .on("finish", () => resolve(true))
+            .on("error", (err) => {
+            console.log(err);
+            reject(false);
+        }));
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => project_1.Project),
-    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(0, (0, type_graphql_1.Arg)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
@@ -36,6 +49,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "projects", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)("file", () => graphql_upload_1.GraphQLUpload)),
+    __param(1, (0, type_graphql_1.Arg)("name")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], ProjectResolver.prototype, "createProject", null);
 ProjectResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], ProjectResolver);
