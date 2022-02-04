@@ -9,14 +9,41 @@ import {
   InputType,
 } from "type-graphql";
 
-import {} from ''
+import { v4 } from "uuid";
 
 import { GraphQLUpload, FileUpload } from "graphql-upload";
 
-import { Stream } from "stream";
-
-import { Project, ProjectModel } from "../entities/project";
+import { Project, ProjectModel, Stack, StackScalar } from "../entities/project";
 import { createWriteStream } from "fs";
+import { sleep } from "../util/sleep";
+import { uploadFile } from "../util/s3";
+
+@InputType()
+class ProjectInput {
+  @Field()
+  title!: string;
+
+  @Field()
+  description!: string;
+
+  @Field(() => GraphQLUpload)
+  photoFile: FileUpload;
+
+  @Field()
+  startDate!: Date;
+
+  @Field({ nullable: true })
+  endDate: Date;
+
+  @Field(() => [String])
+  repositoryLinks!: string[];
+
+  @Field(() => StackScalar)
+  stack!: Stack;
+
+  @Field(() => Boolean)
+  inProgress!: boolean;
+}
 
 @Resolver()
 export class ProjectResolver {
@@ -30,21 +57,38 @@ export class ProjectResolver {
     return await ProjectModel.find();
   }
 
-  @Mutation(() => Boolean)
-  async createProject(
-    @Arg("file", () => GraphQLUpload) file: FileUpload,
-    @Arg("name") name: string
-  ): Promise<boolean> {
-    console.log("HERE ARE THE ARGS", file, name);
-    const { createReadStream, filename } = file;
-    return new Promise(async (resolve, reject) =>
-      createReadStream()
-        .pipe(createWriteStream(__dirname + `/../../images/${filename}`))
-        .on("finish", () => resolve(true))
-        .on("error", (err) => {
-            console.log(err);
-            reject(false)
-        })
-    );
+  @Mutation(() => Project)
+  async createProject(@Arg("input") input: ProjectInput): Promise<Project> {
+    const {
+      title,
+      description,
+      photoFile,
+      startDate,
+      stack,
+      endDate,
+      inProgress,
+      repositoryLinks,
+    } = input;
+    console.log("HERE IS INPUT", input);
+
+    try {
+      const s3Result = await uploadFile(photoFile);
+      const { Location } = s3Result;
+      console.log("HERE IS RESULT", s3Result);
+      return await ProjectModel.create({
+        _id: v4(),
+        title,
+        photoURL: Location,
+        description,
+        startDate,
+        endDate,
+        inProgress,
+        repositoryLinks,
+        stack,
+      });
+    } catch (error) {
+      console.log("s3 error lol", error);
+      throw new Error("Failed to upload image");
+    }
   }
 }

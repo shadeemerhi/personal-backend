@@ -9,10 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectModel = exports.Project = void 0;
+exports.ProjectModel = exports.Project = exports.StackScalar = void 0;
 const typegoose_1 = require("@typegoose/typegoose");
 const type_graphql_1 = require("type-graphql");
-let Project = class Project {
+const defaultClasses_1 = require("@typegoose/typegoose/lib/defaultClasses");
+const graphql_1 = require("graphql");
+exports.StackScalar = new graphql_1.GraphQLScalarType({
+    name: "Stack",
+    description: "A project tech stack",
+});
+let Project = class Project extends defaultClasses_1.TimeStamps {
 };
 __decorate([
     (0, type_graphql_1.Field)(() => String),
@@ -21,9 +27,52 @@ __decorate([
 ], Project.prototype, "_id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),
-    (0, typegoose_1.prop)(),
+    (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
 ], Project.prototype, "title", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", String)
+], Project.prototype, "photoURL", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", String)
+], Project.prototype, "description", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => Date),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", Date)
+], Project.prototype, "startDate", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => Date, { nullable: true }),
+    (0, typegoose_1.prop)(),
+    __metadata("design:type", Object)
+], Project.prototype, "endDate", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => Boolean),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", Boolean)
+], Project.prototype, "inProgress", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => [String]),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", Array)
+], Project.prototype, "repositoryLinks", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => exports.StackScalar),
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", Object)
+], Project.prototype, "stack", void 0);
+__decorate([
+    (0, typegoose_1.prop)(),
+    __metadata("design:type", Date)
+], Project.prototype, "createdAt", void 0);
+__decorate([
+    (0, typegoose_1.prop)(),
+    __metadata("design:type", Date)
+], Project.prototype, "updatedAt", void 0);
 Project = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], Project);
