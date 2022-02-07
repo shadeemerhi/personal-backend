@@ -19,7 +19,7 @@ import { sleep } from "../util/sleep";
 import { uploadFile } from "../util/s3";
 
 @InputType()
-class ProjectInput {
+class NewProjectInput {
   @Field()
   title!: string;
 
@@ -45,6 +45,36 @@ class ProjectInput {
   inProgress!: boolean;
 }
 
+@InputType()
+class UpdateProjectInput {
+  @Field()
+  title?: string;
+
+  @Field()
+  description?: string;
+
+  @Field(() => GraphQLUpload)
+  photoFile?: FileUpload;
+
+  @Field()
+  photoURL?: string;
+
+  @Field()
+  startDate?: Date;
+
+  @Field({ nullable: true })
+  endDate?: Date;
+
+  @Field(() => [String])
+  repositoryLinks?: string[];
+
+  @Field(() => StackScalar)
+  stack?: Stack;
+
+  @Field(() => Boolean)
+  inProgress?: boolean;
+}
+
 @Resolver()
 export class ProjectResolver {
   @Query(() => Project)
@@ -58,7 +88,7 @@ export class ProjectResolver {
   }
 
   @Mutation(() => Project)
-  async createProject(@Arg("input") input: ProjectInput): Promise<Project> {
+  async createProject(@Arg("input") input: NewProjectInput): Promise<Project> {
     const {
       title,
       description,

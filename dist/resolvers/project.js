@@ -18,43 +18,84 @@ const uuid_1 = require("uuid");
 const graphql_upload_1 = require("graphql-upload");
 const project_1 = require("../entities/project");
 const s3_1 = require("../util/s3");
-let ProjectInput = class ProjectInput {
+let NewProjectInput = class NewProjectInput {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], ProjectInput.prototype, "title", void 0);
+], NewProjectInput.prototype, "title", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], ProjectInput.prototype, "description", void 0);
+], NewProjectInput.prototype, "description", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload),
     __metadata("design:type", Object)
-], ProjectInput.prototype, "photoFile", void 0);
+], NewProjectInput.prototype, "photoFile", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", Date)
-], ProjectInput.prototype, "startDate", void 0);
+], NewProjectInput.prototype, "startDate", void 0);
 __decorate([
     (0, type_graphql_1.Field)({ nullable: true }),
     __metadata("design:type", Date)
-], ProjectInput.prototype, "endDate", void 0);
+], NewProjectInput.prototype, "endDate", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => [String]),
     __metadata("design:type", Array)
-], ProjectInput.prototype, "repositoryLinks", void 0);
+], NewProjectInput.prototype, "repositoryLinks", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => project_1.StackScalar),
     __metadata("design:type", Object)
-], ProjectInput.prototype, "stack", void 0);
+], NewProjectInput.prototype, "stack", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
-], ProjectInput.prototype, "inProgress", void 0);
-ProjectInput = __decorate([
+], NewProjectInput.prototype, "inProgress", void 0);
+NewProjectInput = __decorate([
     (0, type_graphql_1.InputType)()
-], ProjectInput);
+], NewProjectInput);
+let UpdateProjectInput = class UpdateProjectInput {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateProjectInput.prototype, "title", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateProjectInput.prototype, "description", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload),
+    __metadata("design:type", Object)
+], UpdateProjectInput.prototype, "photoFile", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateProjectInput.prototype, "photoURL", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Date)
+], UpdateProjectInput.prototype, "startDate", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", Date)
+], UpdateProjectInput.prototype, "endDate", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => [String]),
+    __metadata("design:type", Array)
+], UpdateProjectInput.prototype, "repositoryLinks", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => project_1.StackScalar),
+    __metadata("design:type", Object)
+], UpdateProjectInput.prototype, "stack", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => Boolean),
+    __metadata("design:type", Boolean)
+], UpdateProjectInput.prototype, "inProgress", void 0);
+UpdateProjectInput = __decorate([
+    (0, type_graphql_1.InputType)()
+], UpdateProjectInput);
 let ProjectResolver = class ProjectResolver {
     async project(id) {
         return await project_1.ProjectModel.findOne({ id });
@@ -104,7 +145,7 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => project_1.Project),
     __param(0, (0, type_graphql_1.Arg)("input")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [ProjectInput]),
+    __metadata("design:paramtypes", [NewProjectInput]),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "createProject", null);
 ProjectResolver = __decorate([
