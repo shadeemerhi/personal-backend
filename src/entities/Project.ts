@@ -1,5 +1,5 @@
 import { ObjectId, PromiseProvider } from "mongoose";
-import { getModelForClass, prop } from "@typegoose/typegoose";
+import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 import { Field, ObjectType } from "type-graphql";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { GraphQLScalarType } from "graphql";

@@ -47,17 +47,21 @@ class NewProjectInput {
 
 @InputType()
 class UpdateProjectInput {
+
+  @Field()
+  _id: string;
+
   @Field()
   title?: string;
 
   @Field()
   description?: string;
 
-  @Field(() => GraphQLUpload)
-  photoFile?: FileUpload;
+  @Field(() => GraphQLUpload, { nullable: true })
+  photoFile: FileUpload;
 
   @Field()
-  photoURL?: string;
+  photoURL: string;
 
   @Field()
   startDate?: Date;
@@ -120,5 +124,24 @@ export class ProjectResolver {
       console.log("s3 error lol", error);
       throw new Error("Failed to upload image");
     }
+  }
+
+  @Mutation(() => Project)
+  async updateProject(
+    @Arg("input") input: UpdateProjectInput
+  ): Promise<Project | null> {
+    const { _id, photoFile } = input;
+    if (photoFile) {
+      // logic to update photo in s3
+    }
+
+    const project = await ProjectModel.findById({ _id });
+
+    // Should never happen
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    return await ProjectModel.findOneAndUpdate({ id }, input);
   }
 }

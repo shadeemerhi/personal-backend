@@ -60,13 +60,17 @@ let UpdateProjectInput = class UpdateProjectInput {
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
+], UpdateProjectInput.prototype, "_id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
 ], UpdateProjectInput.prototype, "title", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
 ], UpdateProjectInput.prototype, "description", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload),
+    (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload, { nullable: true }),
     __metadata("design:type", Object)
 ], UpdateProjectInput.prototype, "photoFile", void 0);
 __decorate([
@@ -127,6 +131,16 @@ let ProjectResolver = class ProjectResolver {
             throw new Error("Failed to upload image");
         }
     }
+    async updateProject(input) {
+        const { _id, photoFile } = input;
+        if (photoFile) {
+        }
+        const project = await project_1.ProjectModel.findById({ _id });
+        if (!project) {
+            throw new Error("Project not found");
+        }
+        return await project_1.ProjectModel.findOneAndUpdate({ id }, input);
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => project_1.Project),
@@ -148,6 +162,13 @@ __decorate([
     __metadata("design:paramtypes", [NewProjectInput]),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "createProject", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => project_1.Project),
+    __param(0, (0, type_graphql_1.Arg)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [UpdateProjectInput]),
+    __metadata("design:returntype", Promise)
+], ProjectResolver.prototype, "updateProject", null);
 ProjectResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], ProjectResolver);
