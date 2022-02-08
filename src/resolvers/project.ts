@@ -47,7 +47,6 @@ class NewProjectInput {
 
 @InputType()
 class UpdateProjectInput {
-
   @Field()
   _id: string;
 
@@ -142,6 +141,6 @@ export class ProjectResolver {
       throw new Error("Project not found");
     }
 
-    return await ProjectModel.findOneAndUpdate({ id }, input);
+    return await ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
   }
 }

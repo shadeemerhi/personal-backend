@@ -139,7 +139,7 @@ let ProjectResolver = class ProjectResolver {
         if (!project) {
             throw new Error("Project not found");
         }
-        return await project_1.ProjectModel.findOneAndUpdate({ id }, input);
+        return await project_1.ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
     }
 };
 __decorate([
