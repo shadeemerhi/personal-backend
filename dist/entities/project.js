@@ -70,6 +70,10 @@ __decorate([
     __metadata("design:type", Object)
 ], Project.prototype, "stack", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(() => String, { nullable: true }),
+    __metadata("design:type", String)
+], Project.prototype, "adminPassKey", void 0);
+__decorate([
     (0, typegoose_1.prop)(),
     __metadata("design:type", Date)
 ], Project.prototype, "createdAt", void 0);

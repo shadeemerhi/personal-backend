@@ -40,7 +40,7 @@ export class Project extends TimeStamps {
   @Field(() => String)
   @prop({ required: true })
   photoURL!: string;
-  
+
   @prop({ required: true })
   s3Key!: string;
 
@@ -67,6 +67,9 @@ export class Project extends TimeStamps {
   @Field(() => StackScalar)
   @prop({ required: true })
   stack!: Stack;
+
+  @Field(() => String, { nullable: true })
+  adminPassKey: string;
 
   @prop()
   createdAt: Date;

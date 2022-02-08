@@ -18,6 +18,7 @@ const uuid_1 = require("uuid");
 const graphql_upload_1 = require("graphql-upload");
 const project_1 = require("../entities/project");
 const s3_1 = require("../util/s3");
+const isAuth_1 = require("../middleware/isAuth");
 let NewProjectInput = class NewProjectInput {
 };
 __decorate([
@@ -52,6 +53,10 @@ __decorate([
     (0, type_graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
 ], NewProjectInput.prototype, "inProgress", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    __metadata("design:type", String)
+], NewProjectInput.prototype, "adminPassKey", void 0);
 NewProjectInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], NewProjectInput);
@@ -97,6 +102,10 @@ __decorate([
     (0, type_graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
 ], UpdateProjectInput.prototype, "inProgress", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    __metadata("design:type", String)
+], UpdateProjectInput.prototype, "adminPassKey", void 0);
 UpdateProjectInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], UpdateProjectInput);
@@ -108,8 +117,11 @@ let ProjectResolver = class ProjectResolver {
         return await project_1.ProjectModel.find();
     }
     async createProject(input) {
-        const { title, description, photoFile, startDate, stack, endDate, inProgress, repositoryLinks, } = input;
+        const { title, description, photoFile, startDate, stack, endDate, inProgress, repositoryLinks, adminPassKey, } = input;
         console.log("HERE IS INPUT", input);
+        if (!(0, isAuth_1.isAuth)(adminPassKey)) {
+            throw new Error("Not authorized");
+        }
         try {
             const s3Result = await (0, s3_1.uploadFile)(photoFile);
             const { Location, Key } = s3Result;
@@ -133,7 +145,10 @@ let ProjectResolver = class ProjectResolver {
         }
     }
     async updateProject(input) {
-        const { _id, photoFile } = input;
+        const { _id, photoFile, adminPassKey } = input;
+        if (!(0, isAuth_1.isAuth)(adminPassKey)) {
+            throw new Error("Not authorized");
+        }
         try {
             const project = await project_1.ProjectModel.findById({ _id });
             if (!project) {
@@ -149,7 +164,7 @@ let ProjectResolver = class ProjectResolver {
             throw new Error("Failed to update project");
         }
     }
-    async deleteProject(_id) {
+    async deleteProject(_id, secretKey) {
         try {
             const project = await project_1.ProjectModel.findById({ _id });
             if (!project) {
@@ -195,7 +210,7 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)("_id")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "deleteProject", null);
 ProjectResolver = __decorate([

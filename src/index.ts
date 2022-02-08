@@ -6,7 +6,8 @@ import cors from "cors";
 import { buildSchema } from "type-graphql";
 import { ProjectResolver } from "./resolvers/project";
 import connectDB from "./config/db.js";
-import { graphqlUploadExpress } from 'graphql-upload'
+import { graphqlUploadExpress } from "graphql-upload";
+import { MyContext } from "./types";
 
 const main = async () => {
   const app = express();
@@ -17,14 +18,17 @@ const main = async () => {
       credentials: true,
     })
   );
-  
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [ProjectResolver],
       validate: false,
     }),
-    context: ({}): any => ({}),
+    context: ({ req, res }): MyContext => ({
+      adminPasskey: process.env.ADMIN_PASSKEY as string,
+      req,
+      res
+    }),
     uploads: false,
   });
 

@@ -23,7 +23,11 @@ const main = async () => {
             resolvers: [project_1.ProjectResolver],
             validate: false,
         }),
-        context: ({}) => ({}),
+        context: ({ req, res }) => ({
+            adminPasskey: process.env.ADMIN_PASSKEY,
+            req,
+            res
+        }),
         uploads: false,
     });
     app.use((0, graphql_upload_1.graphqlUploadExpress)());

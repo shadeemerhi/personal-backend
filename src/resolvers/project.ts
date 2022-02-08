@@ -7,6 +7,7 @@ import {
   Arg,
   Mutation,
   InputType,
+  UseMiddleware,
 } from "type-graphql";
 
 import { v4 } from "uuid";
@@ -17,6 +18,7 @@ import { Project, ProjectModel, Stack, StackScalar } from "../entities/project";
 import { createWriteStream } from "fs";
 import { sleep } from "../util/sleep";
 import { deleteFile, uploadFile } from "../util/s3";
+import { isAuth } from "../middleware/isAuth";
 
 @InputType()
 class NewProjectInput {
@@ -43,6 +45,9 @@ class NewProjectInput {
 
   @Field(() => Boolean)
   inProgress!: boolean;
+
+  @Field(() => String)
+  adminPassKey: string;
 }
 
 @InputType()
@@ -76,6 +81,9 @@ class UpdateProjectInput {
 
   @Field(() => Boolean)
   inProgress?: boolean;
+
+  @Field(() => String)
+  adminPassKey?: string;
 }
 
 @Resolver()
@@ -101,8 +109,12 @@ export class ProjectResolver {
       endDate,
       inProgress,
       repositoryLinks,
+      adminPassKey,
     } = input;
     console.log("HERE IS INPUT", input);
+    if (!isAuth(adminPassKey)) {
+      throw new Error("Not authorized");
+    }
 
     try {
       const s3Result = await uploadFile(photoFile);
@@ -130,7 +142,12 @@ export class ProjectResolver {
   async updateProject(
     @Arg("input") input: UpdateProjectInput
   ): Promise<Project | null> {
-    const { _id, photoFile } = input;
+    const { _id, photoFile, adminPassKey } = input;
+
+    if (!isAuth(adminPassKey as string)) {
+      throw new Error("Not authorized");
+    }
+
     try {
       const project = await ProjectModel.findById({ _id });
 
@@ -150,7 +167,7 @@ export class ProjectResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteProject(@Arg("_id") _id: string) {
+  async deleteProject(@Arg("_id") _id: string, secretKey: string) {
     try {
       const project = await ProjectModel.findById({ _id });
 
