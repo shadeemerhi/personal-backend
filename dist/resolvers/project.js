@@ -141,6 +141,15 @@ let ProjectResolver = class ProjectResolver {
         }
         return await project_1.ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
     }
+    async deleteProject(_id) {
+        try {
+            await project_1.ProjectModel.deleteOne({ _id });
+            return true;
+        }
+        catch (error) {
+            throw new Error("Error deleting post");
+        }
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => project_1.Project),
@@ -169,6 +178,13 @@ __decorate([
     __metadata("design:paramtypes", [UpdateProjectInput]),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "updateProject", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)("_id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ProjectResolver.prototype, "deleteProject", null);
 ProjectResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], ProjectResolver);

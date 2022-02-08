@@ -143,4 +143,14 @@ export class ProjectResolver {
 
     return await ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
   }
+
+  @Mutation(() => Boolean)
+  async deleteProject(@Arg("_id") _id: string) {
+    try {
+      await ProjectModel.deleteOne({ _id });
+      return true;
+    } catch (error) {
+      throw new Error("Error deleting post");
+    }
+  }
 }
