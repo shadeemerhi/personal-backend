@@ -40,6 +40,9 @@ export class Project extends TimeStamps {
   @Field(() => String)
   @prop({ required: true })
   photoURL!: string;
+  
+  @prop({ required: true })
+  s3Key!: string;
 
   @Field(() => String)
   @prop({ required: true })

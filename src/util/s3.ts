@@ -15,7 +15,8 @@ const s3 = new S3({
   secretAccessKey,
 });
 
-export const uploadFile = async (file: FileUpload) => {
+// If a key is passed, we are updating a file
+export const uploadFile = async (file: FileUpload, key?: string) => {
   const { createReadStream, filename, mimetype, encoding } = await file;
 
   const fileStream = createReadStream();
@@ -23,9 +24,18 @@ export const uploadFile = async (file: FileUpload) => {
   const uploadParams: PutObjectRequest = {
     Bucket: bucketName as string,
     Body: fileStream,
-    Key: `${v4()}${extname(filename)}`,
+    Key: key ? key : `${v4()}${extname(filename)}`,
     ContentType: mimetype,
   };
 
   return s3.upload(uploadParams).promise();
+};
+
+export const deleteFile = async (key: string) => {
+  return s3
+    .deleteObject({
+      Bucket: bucketName as string,
+      Key: key,
+    })
+    .promise();
 };

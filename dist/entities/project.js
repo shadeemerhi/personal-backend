@@ -36,6 +36,10 @@ __decorate([
     __metadata("design:type", String)
 ], Project.prototype, "photoURL", void 0);
 __decorate([
+    (0, typegoose_1.prop)({ required: true }),
+    __metadata("design:type", String)
+], Project.prototype, "s3Key", void 0);
+__decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)

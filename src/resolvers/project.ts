@@ -16,7 +16,7 @@ import { GraphQLUpload, FileUpload } from "graphql-upload";
 import { Project, ProjectModel, Stack, StackScalar } from "../entities/project";
 import { createWriteStream } from "fs";
 import { sleep } from "../util/sleep";
-import { uploadFile } from "../util/s3";
+import { deleteFile, uploadFile } from "../util/s3";
 
 @InputType()
 class NewProjectInput {
@@ -57,7 +57,7 @@ class UpdateProjectInput {
   description?: string;
 
   @Field(() => GraphQLUpload, { nullable: true })
-  photoFile: FileUpload;
+  photoFile?: FileUpload;
 
   @Field()
   photoURL: string;
@@ -106,12 +106,13 @@ export class ProjectResolver {
 
     try {
       const s3Result = await uploadFile(photoFile);
-      const { Location } = s3Result;
+      const { Location, Key } = s3Result;
       console.log("HERE IS RESULT", s3Result);
       return await ProjectModel.create({
         _id: v4(),
         title,
         photoURL: Location,
+        s3Key: Key,
         description,
         startDate,
         endDate,
@@ -130,23 +131,34 @@ export class ProjectResolver {
     @Arg("input") input: UpdateProjectInput
   ): Promise<Project | null> {
     const { _id, photoFile } = input;
-    if (photoFile) {
-      // logic to update photo in s3
+    try {
+      const project = await ProjectModel.findById({ _id });
+
+      // Should never happen
+      if (!project) {
+        throw new Error("Project not found");
+      }
+
+      if (photoFile) {
+        await uploadFile(photoFile, project.s3Key);
+        delete input.photoFile;
+      }
+      return await ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
+    } catch (error) {
+      throw new Error("Failed to update project");
     }
-
-    const project = await ProjectModel.findById({ _id });
-
-    // Should never happen
-    if (!project) {
-      throw new Error("Project not found");
-    }
-
-    return await ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
   }
 
   @Mutation(() => Boolean)
   async deleteProject(@Arg("_id") _id: string) {
     try {
+      const project = await ProjectModel.findById({ _id });
+
+      // Should never happen
+      if (!project) {
+        throw new Error("Project not found");
+      }
+      await deleteFile(project.s3Key);
       await ProjectModel.deleteOne({ _id });
       return true;
     } catch (error) {

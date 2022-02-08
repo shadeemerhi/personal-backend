@@ -112,12 +112,13 @@ let ProjectResolver = class ProjectResolver {
         console.log("HERE IS INPUT", input);
         try {
             const s3Result = await (0, s3_1.uploadFile)(photoFile);
-            const { Location } = s3Result;
+            const { Location, Key } = s3Result;
             console.log("HERE IS RESULT", s3Result);
             return await project_1.ProjectModel.create({
                 _id: (0, uuid_1.v4)(),
                 title,
                 photoURL: Location,
+                s3Key: Key,
                 description,
                 startDate,
                 endDate,
@@ -133,16 +134,28 @@ let ProjectResolver = class ProjectResolver {
     }
     async updateProject(input) {
         const { _id, photoFile } = input;
-        if (photoFile) {
+        try {
+            const project = await project_1.ProjectModel.findById({ _id });
+            if (!project) {
+                throw new Error("Project not found");
+            }
+            if (photoFile) {
+                await (0, s3_1.uploadFile)(photoFile, project.s3Key);
+                delete input.photoFile;
+            }
+            return await project_1.ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
         }
-        const project = await project_1.ProjectModel.findById({ _id });
-        if (!project) {
-            throw new Error("Project not found");
+        catch (error) {
+            throw new Error("Failed to update project");
         }
-        return await project_1.ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
     }
     async deleteProject(_id) {
         try {
+            const project = await project_1.ProjectModel.findById({ _id });
+            if (!project) {
+                throw new Error("Project not found");
+            }
+            await (0, s3_1.deleteFile)(project.s3Key);
             await project_1.ProjectModel.deleteOne({ _id });
             return true;
         }
