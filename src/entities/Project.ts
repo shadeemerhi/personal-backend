@@ -28,10 +28,15 @@ export type Stack = {
 };
 
 @ObjectType()
+// @modelOptions({ schemaOptions: { _id: false } })
 export class Project extends TimeStamps {
   @Field(() => String)
   @prop()
-  readonly _id: string;
+  id: string;
+
+  @Field(() => String)
+  @prop()
+  _id: string;
 
   @Field(() => String)
   @prop({ required: true })

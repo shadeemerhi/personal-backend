@@ -47,9 +47,8 @@ class NewProjectInput {
 
 @InputType()
 class UpdateProjectInput {
-
   @Field()
-  _id: string;
+  id: string;
 
   @Field()
   title?: string;
@@ -110,6 +109,7 @@ export class ProjectResolver {
       const { Location } = s3Result;
       console.log("HERE IS RESULT", s3Result);
       return await ProjectModel.create({
+        id: v4(),
         _id: v4(),
         title,
         photoURL: Location,
@@ -130,18 +130,19 @@ export class ProjectResolver {
   async updateProject(
     @Arg("input") input: UpdateProjectInput
   ): Promise<Project | null> {
-    const { _id, photoFile } = input;
+    const { id, photoFile } = input;
     if (photoFile) {
       // logic to update photo in s3
     }
+    console.log("HERE IS UPDATE ID", id);
 
-    const project = await ProjectModel.findById({ _id });
+    const project = await ProjectModel.findOne({ id });
 
     // Should never happen
     if (!project) {
       throw new Error("Project not found");
     }
 
-    return await ProjectModel.findOneAndUpdate({ id }, input);
+    return await ProjectModel.findOneAndUpdate({ id }, input, { new: true });
   }
 }

@@ -24,6 +24,11 @@ __decorate([
     (0, type_graphql_1.Field)(() => String),
     (0, typegoose_1.prop)(),
     __metadata("design:type", String)
+], Project.prototype, "id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    (0, typegoose_1.prop)(),
+    __metadata("design:type", String)
 ], Project.prototype, "_id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => String),

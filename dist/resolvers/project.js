@@ -60,7 +60,7 @@ let UpdateProjectInput = class UpdateProjectInput {
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], UpdateProjectInput.prototype, "_id", void 0);
+], UpdateProjectInput.prototype, "id", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
@@ -115,6 +115,7 @@ let ProjectResolver = class ProjectResolver {
             const { Location } = s3Result;
             console.log("HERE IS RESULT", s3Result);
             return await project_1.ProjectModel.create({
+                id: (0, uuid_1.v4)(),
                 _id: (0, uuid_1.v4)(),
                 title,
                 photoURL: Location,
@@ -132,14 +133,15 @@ let ProjectResolver = class ProjectResolver {
         }
     }
     async updateProject(input) {
-        const { _id, photoFile } = input;
+        const { id, photoFile } = input;
         if (photoFile) {
         }
-        const project = await project_1.ProjectModel.findById({ _id });
+        console.log("HERE IS UPDATE ID", id);
+        const project = await project_1.ProjectModel.findOne({ id });
         if (!project) {
             throw new Error("Project not found");
         }
-        return await project_1.ProjectModel.findOneAndUpdate({ id }, input);
+        return await project_1.ProjectModel.findOneAndUpdate({ id }, input, { new: true });
     }
 };
 __decorate([
