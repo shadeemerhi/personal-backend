@@ -1,24 +1,9 @@
-import {
-  ObjectType,
-  Field,
-  Resolver,
-  Query,
-  Int,
-  Arg,
-  Mutation,
-  InputType,
-  UseMiddleware,
-} from "type-graphql";
-
+import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { Arg, Field, InputType, Mutation, Query, Resolver } from "type-graphql";
 import { v4 } from "uuid";
-
-import { GraphQLUpload, FileUpload } from "graphql-upload";
-
 import { Project, ProjectModel, Stack, StackScalar } from "../entities/project";
-import { createWriteStream } from "fs";
-import { sleep } from "../util/sleep";
-import { deleteFile, uploadFile } from "../util/s3";
 import { isAuth } from "../middleware/isAuth";
+import { deleteFile, uploadFile } from "../util/s3";
 
 @InputType()
 class NewProjectInput {
@@ -45,9 +30,6 @@ class NewProjectInput {
 
   @Field(() => Boolean)
   inProgress!: boolean;
-
-  @Field(() => String)
-  adminPassKey: string;
 }
 
 @InputType()
@@ -81,9 +63,6 @@ class UpdateProjectInput {
 
   @Field(() => Boolean)
   inProgress?: boolean;
-
-  @Field(() => String)
-  adminPassKey?: string;
 }
 
 @Resolver()
@@ -99,7 +78,10 @@ export class ProjectResolver {
   }
 
   @Mutation(() => Project)
-  async createProject(@Arg("input") input: NewProjectInput): Promise<Project> {
+  async createProject(
+    @Arg("input") input: NewProjectInput,
+    @Arg("adminKey") adminKey: string
+  ): Promise<Project> {
     const {
       title,
       description,
@@ -109,10 +91,8 @@ export class ProjectResolver {
       endDate,
       inProgress,
       repositoryLinks,
-      adminPassKey,
     } = input;
-    console.log("HERE IS INPUT", input);
-    if (!isAuth(adminPassKey)) {
+    if (!isAuth(adminKey)) {
       throw new Error("Not authorized");
     }
 
@@ -140,11 +120,12 @@ export class ProjectResolver {
 
   @Mutation(() => Project)
   async updateProject(
-    @Arg("input") input: UpdateProjectInput
+    @Arg("input") input: UpdateProjectInput,
+    @Arg("adminKey") adminKey: string
   ): Promise<Project | null> {
-    const { _id, photoFile, adminPassKey } = input;
+    const { _id, photoFile } = input;
 
-    if (!isAuth(adminPassKey as string)) {
+    if (!isAuth(adminKey)) {
       throw new Error("Not authorized");
     }
 
@@ -167,7 +148,14 @@ export class ProjectResolver {
   }
 
   @Mutation(() => Boolean)
-  async deleteProject(@Arg("_id") _id: string, secretKey: string) {
+  async deleteProject(
+    @Arg("_id") _id: string,
+    @Arg("adminKey") adminKey: string
+  ) {
+    if (!isAuth(adminKey)) {
+      throw new Error("Not authorized");
+    }
+
     try {
       const project = await ProjectModel.findById({ _id });
 

@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectModel = exports.Project = exports.StackScalar = void 0;
 const typegoose_1 = require("@typegoose/typegoose");
-const type_graphql_1 = require("type-graphql");
 const defaultClasses_1 = require("@typegoose/typegoose/lib/defaultClasses");
 const graphql_1 = require("graphql");
+const type_graphql_1 = require("type-graphql");
 exports.StackScalar = new graphql_1.GraphQLScalarType({
     name: "Stack",
     description: "A project tech stack",
@@ -69,10 +69,6 @@ __decorate([
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", Object)
 ], Project.prototype, "stack", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => String, { nullable: true }),
-    __metadata("design:type", String)
-], Project.prototype, "adminPassKey", void 0);
 __decorate([
     (0, typegoose_1.prop)(),
     __metadata("design:type", Date)

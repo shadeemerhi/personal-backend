@@ -13,12 +13,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectResolver = void 0;
+const graphql_upload_1 = require("graphql-upload");
 const type_graphql_1 = require("type-graphql");
 const uuid_1 = require("uuid");
-const graphql_upload_1 = require("graphql-upload");
 const project_1 = require("../entities/project");
-const s3_1 = require("../util/s3");
 const isAuth_1 = require("../middleware/isAuth");
+const s3_1 = require("../util/s3");
 let NewProjectInput = class NewProjectInput {
 };
 __decorate([
@@ -53,10 +53,6 @@ __decorate([
     (0, type_graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
 ], NewProjectInput.prototype, "inProgress", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => String),
-    __metadata("design:type", String)
-], NewProjectInput.prototype, "adminPassKey", void 0);
 NewProjectInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], NewProjectInput);
@@ -102,10 +98,6 @@ __decorate([
     (0, type_graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
 ], UpdateProjectInput.prototype, "inProgress", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(() => String),
-    __metadata("design:type", String)
-], UpdateProjectInput.prototype, "adminPassKey", void 0);
 UpdateProjectInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], UpdateProjectInput);
@@ -116,10 +108,9 @@ let ProjectResolver = class ProjectResolver {
     async projects() {
         return await project_1.ProjectModel.find();
     }
-    async createProject(input) {
-        const { title, description, photoFile, startDate, stack, endDate, inProgress, repositoryLinks, adminPassKey, } = input;
-        console.log("HERE IS INPUT", input);
-        if (!(0, isAuth_1.isAuth)(adminPassKey)) {
+    async createProject(input, adminKey) {
+        const { title, description, photoFile, startDate, stack, endDate, inProgress, repositoryLinks, } = input;
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
             throw new Error("Not authorized");
         }
         try {
@@ -144,9 +135,9 @@ let ProjectResolver = class ProjectResolver {
             throw new Error("Failed to upload image");
         }
     }
-    async updateProject(input) {
-        const { _id, photoFile, adminPassKey } = input;
-        if (!(0, isAuth_1.isAuth)(adminPassKey)) {
+    async updateProject(input, adminKey) {
+        const { _id, photoFile } = input;
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
             throw new Error("Not authorized");
         }
         try {
@@ -164,7 +155,10 @@ let ProjectResolver = class ProjectResolver {
             throw new Error("Failed to update project");
         }
     }
-    async deleteProject(_id, secretKey) {
+    async deleteProject(_id, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
         try {
             const project = await project_1.ProjectModel.findById({ _id });
             if (!project) {
@@ -195,20 +189,23 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Mutation)(() => project_1.Project),
     __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [NewProjectInput]),
+    __metadata("design:paramtypes", [NewProjectInput, String]),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "createProject", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => project_1.Project),
     __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UpdateProjectInput]),
+    __metadata("design:paramtypes", [UpdateProjectInput, String]),
     __metadata("design:returntype", Promise)
 ], ProjectResolver.prototype, "updateProject", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)("_id")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)

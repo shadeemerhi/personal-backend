@@ -1,9 +1,7 @@
-import { ObjectId, PromiseProvider } from "mongoose";
-import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
-import { Field, ObjectType } from "type-graphql";
+import { getModelForClass, prop } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { GraphQLScalarType } from "graphql";
-import { type } from "os";
+import { Field, ObjectType } from "type-graphql";
 
 export const StackScalar = new GraphQLScalarType({
   name: "Stack",
@@ -67,9 +65,6 @@ export class Project extends TimeStamps {
   @Field(() => StackScalar)
   @prop({ required: true })
   stack!: Stack;
-
-  @Field(() => String, { nullable: true })
-  adminPassKey: string;
 
   @prop()
   createdAt: Date;
