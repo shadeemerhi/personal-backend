@@ -136,7 +136,7 @@ let ProjectResolver = class ProjectResolver {
         }
     }
     async updateProject(input, adminKey) {
-        const { _id, photoFile } = input;
+        const { _id, photoFile, endDate } = input;
         if (!(0, isAuth_1.isAuth)(adminKey)) {
             throw new Error("Not authorized");
         }
@@ -149,7 +149,7 @@ let ProjectResolver = class ProjectResolver {
                 await (0, s3_1.uploadFile)(photoFile, project.s3Key);
                 delete input.photoFile;
             }
-            return await project_1.ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
+            return await project_1.ProjectModel.findOneAndUpdate({ _id }, Object.assign(Object.assign({}, input), { endDate: endDate ? endDate : null }), { new: true });
         }
         catch (error) {
             throw new Error("Failed to update project");

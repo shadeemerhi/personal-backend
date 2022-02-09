@@ -123,7 +123,7 @@ export class ProjectResolver {
     @Arg("input") input: UpdateProjectInput,
     @Arg("adminKey") adminKey: string
   ): Promise<Project | null> {
-    const { _id, photoFile } = input;
+    const { _id, photoFile, endDate } = input;
 
     if (!isAuth(adminKey)) {
       throw new Error("Not authorized");
@@ -141,7 +141,11 @@ export class ProjectResolver {
         await uploadFile(photoFile, project.s3Key);
         delete input.photoFile;
       }
-      return await ProjectModel.findOneAndUpdate({ _id }, input, { new: true });
+      return await ProjectModel.findOneAndUpdate(
+        { _id },
+        { ...input, endDate: endDate ? endDate : null },
+        { new: true }
+      );
     } catch (error) {
       throw new Error("Failed to update project");
     }
