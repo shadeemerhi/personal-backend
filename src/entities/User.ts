@@ -16,6 +16,7 @@ export class User extends TimeStamps {
   @prop({ required: true })
   photoURL!: string;
 
+  @Field()
   @prop({ required: true })
   s3Key!: string;
 
@@ -38,6 +39,9 @@ export class User extends TimeStamps {
   @Field(() => String)
   @prop({ required: true })
   bio!: string;
+
+  @Field(() => String)
+  updatedAt: Date;
 }
 
 export const UserModel = getModelForClass(User);

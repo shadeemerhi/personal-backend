@@ -31,6 +31,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "photoURL", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "s3Key", void 0);
@@ -59,6 +60,10 @@ __decorate([
     (0, typegoose_1.prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "bio", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String),
+    __metadata("design:type", Date)
+], User.prototype, "updatedAt", void 0);
 User = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], User);

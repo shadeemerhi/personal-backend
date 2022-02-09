@@ -32,6 +32,9 @@ class NewUserInput {
 @InputType()
 class UpdateUserInput {
   @Field()
+  _id: string;
+
+  @Field()
   title: string;
 
   @Field(() => GraphQLUpload, { nullable: true })
@@ -54,13 +57,16 @@ class UpdateUserInput {
 
   @Field()
   bio: string;
+
+  @Field(() => String, { nullable: true })
+  updatedAt: Date;
 }
 
 @Resolver()
 export class UserResolver {
   @Query(() => User)
-  async user(): Promise<User | null> {
-    return await UserModel.findOne({ email: "shadmerhi@gmail.com" });
+  async user(@Arg("_id") _id: string): Promise<User | null> {
+    return await UserModel.findOne({ _id });
   }
 
   @Mutation(() => User)
@@ -89,11 +95,18 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  async updateUser(@Arg("input") input: UpdateUserInput): Promise<User | null> {
-    const { email, photoFile } = input;
+  async updateUser(
+    @Arg("input") input: UpdateUserInput,
+    @Arg("adminKey") adminKey: string
+  ): Promise<User | null> {
+    if (!isAuth(adminKey)) {
+      throw new Error("Not authorized");
+    }
+
+    const { _id, photoFile } = input;
 
     try {
-      const user = await UserModel.findOne({ email });
+      const user = await UserModel.findOne({ _id });
 
       if (!user) {
         throw new Error("Error finding user");
@@ -103,7 +116,7 @@ export class UserResolver {
         await uploadFile(photoFile, user.s3Key);
       }
 
-      return await UserModel.findOneAndUpdate({ email }, input, { new: true });
+      return await UserModel.findOneAndUpdate({ _id }, input, { new: true });
     } catch (error) {
       throw new Error("Failed to update the user");
     }

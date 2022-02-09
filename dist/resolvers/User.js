@@ -57,6 +57,10 @@ let UpdateUserInput = class UpdateUserInput {
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
+], UpdateUserInput.prototype, "_id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
 ], UpdateUserInput.prototype, "title", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload, { nullable: true }),
@@ -86,12 +90,16 @@ __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
 ], UpdateUserInput.prototype, "bio", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => String, { nullable: true }),
+    __metadata("design:type", Date)
+], UpdateUserInput.prototype, "updatedAt", void 0);
 UpdateUserInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], UpdateUserInput);
 let UserResolver = class UserResolver {
-    async user() {
-        return await User_1.UserModel.findOne({ email: "shadmerhi@gmail.com" });
+    async user(_id) {
+        return await User_1.UserModel.findOne({ _id });
     }
     async createUser(input, adminKey) {
         if (!(0, isAuth_1.isAuth)(adminKey)) {
@@ -107,17 +115,20 @@ let UserResolver = class UserResolver {
             throw new Error("Failed to update the user");
         }
     }
-    async updateUser(input) {
-        const { email, photoFile } = input;
+    async updateUser(input, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
+        const { _id, photoFile } = input;
         try {
-            const user = await User_1.UserModel.findOne({ email });
+            const user = await User_1.UserModel.findOne({ _id });
             if (!user) {
                 throw new Error("Error finding user");
             }
             if (photoFile) {
                 await (0, s3_1.uploadFile)(photoFile, user.s3Key);
             }
-            return await User_1.UserModel.findOneAndUpdate({ email }, input, { new: true });
+            return await User_1.UserModel.findOneAndUpdate({ _id }, input, { new: true });
         }
         catch (error) {
             throw new Error("Failed to update the user");
@@ -126,8 +137,9 @@ let UserResolver = class UserResolver {
 };
 __decorate([
     (0, type_graphql_1.Query)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Arg)("_id")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "user", null);
 __decorate([
@@ -141,8 +153,9 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Mutation)(() => User_1.User),
     __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UpdateUserInput]),
+    __metadata("design:paramtypes", [UpdateUserInput, String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "updateUser", null);
 UserResolver = __decorate([
