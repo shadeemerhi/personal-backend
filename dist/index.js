@@ -12,6 +12,7 @@ const type_graphql_1 = require("type-graphql");
 const project_1 = require("./resolvers/project");
 const db_js_1 = __importDefault(require("./config/db.js"));
 const graphql_upload_1 = require("graphql-upload");
+const user_1 = require("./resolvers/user");
 const main = async () => {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
@@ -20,7 +21,7 @@ const main = async () => {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [project_1.ProjectResolver],
+            resolvers: [project_1.ProjectResolver, user_1.UserResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({

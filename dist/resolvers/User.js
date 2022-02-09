@@ -8,22 +8,145 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectResolver = void 0;
+exports.UserResolver = void 0;
+const graphql_upload_1 = require("graphql-upload");
+const isAuth_1 = require("../middleware/isAuth");
+const s3_1 = require("../util/s3");
 const type_graphql_1 = require("type-graphql");
-let ProjectResolver = class ProjectResolver {
-    test() {
-        return "Hello from test :)";
+const User_1 = require("../entities/User");
+const uuid_1 = require("uuid");
+let NewUserInput = class NewUserInput {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NewUserInput.prototype, "title", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload),
+    __metadata("design:type", Object)
+], NewUserInput.prototype, "photoFile", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NewUserInput.prototype, "githubLink", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NewUserInput.prototype, "linkedInLink", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NewUserInput.prototype, "email", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], NewUserInput.prototype, "preBio", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], NewUserInput.prototype, "bio", void 0);
+NewUserInput = __decorate([
+    (0, type_graphql_1.InputType)()
+], NewUserInput);
+let UpdateUserInput = class UpdateUserInput {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "title", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => graphql_upload_1.GraphQLUpload, { nullable: true }),
+    __metadata("design:type", Object)
+], UpdateUserInput.prototype, "photoFile", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "photoURL", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "githubLink", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "linkedInLink", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "email", void 0);
+__decorate([
+    (0, type_graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "preBio", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], UpdateUserInput.prototype, "bio", void 0);
+UpdateUserInput = __decorate([
+    (0, type_graphql_1.InputType)()
+], UpdateUserInput);
+let UserResolver = class UserResolver {
+    async user() {
+        return await User_1.UserModel.findOne({ email: "shadmerhi@gmail.com" });
+    }
+    async createUser(input, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
+        try {
+            const s3Result = await (0, s3_1.uploadFile)(input.photoFile);
+            const { Location, Key } = s3Result;
+            console.log("HERE IS RESULT", s3Result);
+            return await User_1.UserModel.create(Object.assign(Object.assign({ _id: (0, uuid_1.v4)() }, input), { photoURL: Location, s3Key: Key }));
+        }
+        catch (error) {
+            throw new Error("Failed to update the user");
+        }
+    }
+    async updateUser(input) {
+        const { email, photoFile } = input;
+        try {
+            const user = await User_1.UserModel.findOne({ email });
+            if (!user) {
+                throw new Error("Error finding user");
+            }
+            if (photoFile) {
+                await (0, s3_1.uploadFile)(photoFile, user.s3Key);
+            }
+            return await User_1.UserModel.findOneAndUpdate({ email }, input, { new: true });
+        }
+        catch (error) {
+            throw new Error("Failed to update the user");
+        }
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => String),
+    (0, type_graphql_1.Query)(() => User_1.User),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], ProjectResolver.prototype, "test", null);
-ProjectResolver = __decorate([
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "user", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [NewUserInput, String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "createUser", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Arg)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [UpdateUserInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "updateUser", null);
+UserResolver = __decorate([
     (0, type_graphql_1.Resolver)()
-], ProjectResolver);
-exports.ProjectResolver = ProjectResolver;
-//# sourceMappingURL=User.js.map
+], UserResolver);
+exports.UserResolver = UserResolver;
+//# sourceMappingURL=user.js.map

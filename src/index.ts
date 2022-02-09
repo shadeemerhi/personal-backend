@@ -8,6 +8,7 @@ import { ProjectResolver } from "./resolvers/project";
 import connectDB from "./config/db.js";
 import { graphqlUploadExpress } from "graphql-upload";
 import { MyContext } from "./types";
+import { UserResolver } from "./resolvers/user";
 
 const main = async () => {
   const app = express();
@@ -21,7 +22,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [ProjectResolver],
+      resolvers: [ProjectResolver, UserResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({
