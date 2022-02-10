@@ -19,6 +19,7 @@ const s3_1 = require("../util/s3");
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("../entities/User");
 const uuid_1 = require("uuid");
+const project_1 = require("../entities/project");
 let NewUserInput = class NewUserInput {
 };
 __decorate([
@@ -97,9 +98,39 @@ __decorate([
 UpdateUserInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], UpdateUserInput);
+let UserResponse = class UserResponse {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => User_1.User, { nullable: true }),
+    __metadata("design:type", User_1.User)
+], UserResponse.prototype, "user", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(() => project_1.Project, { nullable: true }),
+    __metadata("design:type", project_1.Project)
+], UserResponse.prototype, "latestRelease", void 0);
+UserResponse = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], UserResponse);
 let UserResolver = class UserResolver {
     async user(_id) {
-        return await User_1.UserModel.findOne({ _id });
+        try {
+            const user = await User_1.UserModel.findOne({ _id });
+            if (!user) {
+                throw new Error("Unable to find user");
+            }
+            const sortedProjects = await project_1.ProjectModel.find().sort({ createdAt: -1 });
+            const latestRelease = sortedProjects[0];
+            if (!latestRelease) {
+                throw new Error("Unable to find latest release");
+            }
+            return {
+                user,
+                latestRelease,
+            };
+        }
+        catch (error) {
+            throw new Error(error.message);
+        }
     }
     async createUser(input, adminKey) {
         if (!(0, isAuth_1.isAuth)(adminKey)) {
@@ -136,7 +167,7 @@ let UserResolver = class UserResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => User_1.User),
+    (0, type_graphql_1.Query)(() => UserResponse),
     __param(0, (0, type_graphql_1.Arg)("_id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

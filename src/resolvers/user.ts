@@ -1,9 +1,18 @@
 import { FileUpload, GraphQLUpload } from "graphql-upload";
 import { isAuth } from "../middleware/isAuth";
 import { uploadFile } from "../util/s3";
-import { Arg, Field, InputType, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Field,
+  InputType,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from "type-graphql";
 import { User, UserModel } from "../entities/User";
 import { v4 } from "uuid";
+import { Project, ProjectModel } from "../entities/project";
 
 @InputType()
 class NewUserInput {
@@ -62,11 +71,39 @@ class UpdateUserInput {
   updatedAt: Date;
 }
 
+@ObjectType()
+class UserResponse {
+  @Field(() => User, { nullable: true })
+  user?: User;
+
+  @Field(() => Project, { nullable: true })
+  latestRelease?: Project;
+}
+
 @Resolver()
 export class UserResolver {
-  @Query(() => User)
-  async user(@Arg("_id") _id: string): Promise<User | null> {
-    return await UserModel.findOne({ _id });
+  @Query(() => UserResponse)
+  async user(@Arg("_id") _id: string): Promise<UserResponse | null> {
+    try {
+      const user = await UserModel.findOne({ _id });
+
+      if (!user) {
+        throw new Error("Unable to find user");
+      }
+      const sortedProjects = await ProjectModel.find().sort({ createdAt: -1 });
+      const latestRelease = sortedProjects[0];
+
+      if (!latestRelease) {
+        throw new Error("Unable to find latest release");
+      }
+
+      return {
+        user,
+        latestRelease,
+      };
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   @Mutation(() => User)
