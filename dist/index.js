@@ -13,7 +13,8 @@ const db_js_1 = __importDefault(require("./config/db.js"));
 const graphql_upload_1 = require("graphql-upload");
 const project_1 = require("./resolvers/project");
 const user_1 = require("./resolvers/user");
-const workItem_js_1 = require("./resolvers/workItem.js");
+const workItem_1 = require("./resolvers/workItem");
+const educationItem_1 = require("./resolvers/educationItem");
 const main = async () => {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
@@ -22,7 +23,12 @@ const main = async () => {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [project_1.ProjectResolver, user_1.UserResolver, workItem_js_1.WorkItemResolver],
+            resolvers: [
+                project_1.ProjectResolver,
+                user_1.UserResolver,
+                workItem_1.WorkItemResolver,
+                educationItem_1.EducationItemResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({

@@ -45,6 +45,11 @@ export class WorkItemResolver {
     return await WorkItemModel.find();
   }
 
+  @Query(() => Boolean)
+  async indicateItems(): Promise<boolean> {
+    return true;
+  }
+
   @Mutation(() => WorkItem)
   async createWorkItem(
     @Arg("input") input: WorkItemInput,

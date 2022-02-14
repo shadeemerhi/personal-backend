@@ -58,6 +58,9 @@ let WorkItemResolver = class WorkItemResolver {
     async workItems() {
         return await WorkItem_1.WorkItemModel.find();
     }
+    async indicateItems() {
+        return true;
+    }
     async createWorkItem(input, adminKey) {
         if (!(0, isAuth_1.isAuth)(adminKey)) {
             throw new Error("Not authorized");
@@ -101,6 +104,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], WorkItemResolver.prototype, "workItems", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => Boolean),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], WorkItemResolver.prototype, "indicateItems", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => WorkItem_1.WorkItem),
     __param(0, (0, type_graphql_1.Arg)("input")),

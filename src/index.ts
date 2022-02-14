@@ -10,7 +10,8 @@ import { graphqlUploadExpress } from "graphql-upload";
 import { MyContext } from "./types";
 import { ProjectResolver } from "./resolvers/project";
 import { UserResolver } from "./resolvers/user";
-import { WorkItemResolver } from "./resolvers/workItem.js";
+import { WorkItemResolver } from "./resolvers/workItem";
+import { EducationItemResolver } from "./resolvers/educationItem";
 
 const main = async () => {
   const app = express();
@@ -24,7 +25,12 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [ProjectResolver, UserResolver, WorkItemResolver],
+      resolvers: [
+        ProjectResolver,
+        UserResolver,
+        WorkItemResolver,
+        EducationItemResolver,
+      ],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({
