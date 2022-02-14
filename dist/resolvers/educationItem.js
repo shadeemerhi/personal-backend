@@ -61,6 +61,18 @@ let EducationItemResolver = class EducationItemResolver {
             throw new Error("Failed to create education item");
         }
     }
+    async updateEducationItem(input, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
+        try {
+            const { _id, endDate } = input;
+            return await EducationItem_1.EducationItemModel.findOneAndUpdate({ _id }, Object.assign(Object.assign({}, input), { endDate: endDate ? endDate : null }), { new: true });
+        }
+        catch (error) {
+            throw new Error("Failed to update education item");
+        }
+    }
     async deleteEducationItem(_id, adminKey) {
         if (!(0, isAuth_1.isAuth)(adminKey)) {
             throw new Error("Not authorized");
@@ -88,6 +100,14 @@ __decorate([
     __metadata("design:paramtypes", [EducationItemInput, String]),
     __metadata("design:returntype", Promise)
 ], EducationItemResolver.prototype, "createEducationItem", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => EducationItem_1.EducationItem),
+    __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [EducationItemInput, String]),
+    __metadata("design:returntype", Promise)
+], EducationItemResolver.prototype, "updateEducationItem", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Boolean),
     __param(0, (0, type_graphql_1.Arg)("_id")),

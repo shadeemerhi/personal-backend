@@ -58,6 +58,27 @@ export class EducationItemResolver {
     }
   }
 
+  @Mutation(() => EducationItem)
+  async updateEducationItem(
+    @Arg("input") input: EducationItemInput,
+    @Arg("adminKey") adminKey: string
+  ) {
+    if (!isAuth(adminKey)) {
+      throw new Error("Not authorized");
+    }
+
+    try {
+      const { _id, endDate } = input;
+      return await EducationItemModel.findOneAndUpdate(
+        { _id },
+        { ...input, endDate: endDate ? endDate : null },
+        { new: true }
+      );
+    } catch (error) {
+      throw new Error("Failed to update education item");
+    }
+  }
+
   @Mutation(() => Boolean)
   async deleteEducationItem(
     @Arg("_id") _id: string,
