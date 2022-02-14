@@ -73,16 +73,32 @@ export class WorkItemResolver {
       throw new Error("Not authorized");
     }
 
-    const { _id } = input;
+    const { _id, endDate } = input;
 
     try {
       return await WorkItemModel.findOneAndUpdate(
         { _id },
-        { ...input },
+        { ...input, endDate: endDate ? endDate : null },
         { new: true }
       );
     } catch (error) {
       throw new Error("Failed to update work item");
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteWorkItem(
+    @Arg("_id") _id: string,
+    @Arg("adminKey") adminKey: string
+  ): Promise<boolean> {
+    if (!isAuth(adminKey)) {
+      throw new Error("Not authorized");
+    }
+    try {
+      await WorkItemModel.deleteOne({ _id });
+      return true;
+    } catch (error) {
+      throw new Error("Error deleting work item");
     }
   }
 }

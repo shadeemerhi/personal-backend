@@ -74,12 +74,24 @@ let WorkItemResolver = class WorkItemResolver {
         if (!(0, isAuth_1.isAuth)(adminKey)) {
             throw new Error("Not authorized");
         }
-        const { _id } = input;
+        const { _id, endDate } = input;
         try {
-            return await WorkItem_1.WorkItemModel.findOneAndUpdate({ _id }, Object.assign({}, input), { new: true });
+            return await WorkItem_1.WorkItemModel.findOneAndUpdate({ _id }, Object.assign(Object.assign({}, input), { endDate: endDate ? endDate : null }), { new: true });
         }
         catch (error) {
             throw new Error("Failed to update work item");
+        }
+    }
+    async deleteWorkItem(_id, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
+        try {
+            await WorkItem_1.WorkItemModel.deleteOne({ _id });
+            return true;
+        }
+        catch (error) {
+            throw new Error("Error deleting work item");
         }
     }
 };
@@ -105,6 +117,14 @@ __decorate([
     __metadata("design:paramtypes", [WorkItemInput, String]),
     __metadata("design:returntype", Promise)
 ], WorkItemResolver.prototype, "updateWorkItem", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)("_id")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], WorkItemResolver.prototype, "deleteWorkItem", null);
 WorkItemResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], WorkItemResolver);
