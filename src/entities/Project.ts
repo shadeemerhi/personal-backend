@@ -1,7 +1,7 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { GraphQLScalarType } from "graphql";
-import { Field, ObjectType } from "type-graphql";
+import { Field, InputType, ObjectType } from "type-graphql";
 
 export const StackScalar = new GraphQLScalarType({
   name: "Stack",
@@ -27,7 +27,7 @@ export type Stack = {
 
 @ObjectType()
 export class Project extends TimeStamps {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @prop()
   readonly _id: string;
 

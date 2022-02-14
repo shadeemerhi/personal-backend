@@ -4,11 +4,13 @@ import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import cors from "cors";
 import { buildSchema } from "type-graphql";
-import { ProjectResolver } from "./resolvers/project";
 import connectDB from "./config/db.js";
 import { graphqlUploadExpress } from "graphql-upload";
+
 import { MyContext } from "./types";
+import { ProjectResolver } from "./resolvers/project";
 import { UserResolver } from "./resolvers/user";
+import { WorkItemResolver } from "./resolvers/workItem.js";
 
 const main = async () => {
   const app = express();
@@ -22,13 +24,13 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [ProjectResolver, UserResolver],
+      resolvers: [ProjectResolver, UserResolver, WorkItemResolver],
       validate: false,
     }),
     context: ({ req, res }): MyContext => ({
       adminPasskey: process.env.ADMIN_PASSKEY as string,
       req,
-      res
+      res,
     }),
     uploads: false,
   });
