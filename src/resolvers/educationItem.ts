@@ -38,4 +38,39 @@ export class EducationItemResolver {
   async educationItems(): Promise<EducationItem[]> {
     return await EducationItemModel.find();
   }
+
+  @Mutation(() => EducationItem)
+  async createEducationItem(
+    @Arg("input") input: EducationItemInput,
+    @Arg("adminKey") adminKey: string
+  ): Promise<EducationItem> {
+    if (!isAuth(adminKey)) {
+      throw new Error("Not authorized");
+    }
+
+    try {
+      return await EducationItemModel.create({
+        _id: v4(),
+        ...input,
+      });
+    } catch (error) {
+      throw new Error("Failed to create education item");
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async deleteEducationItem(
+    @Arg("_id") _id: string,
+    @Arg("adminKey") adminKey: string
+  ) {
+    if (!isAuth(adminKey)) {
+      throw new Error("Not authorized");
+    }
+    try {
+      await EducationItemModel.deleteOne({ _id });
+      return true;
+    } catch (error) {
+      throw new Error("Error deleting education item");
+    }
+  }
 }

@@ -8,10 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EducationItemResolver = void 0;
 const EducationItem_1 = require("../entities/EducationItem");
 const type_graphql_1 = require("type-graphql");
+const isAuth_1 = require("../middleware/isAuth");
+const uuid_1 = require("uuid");
 let EducationItemInput = class EducationItemInput {
 };
 __decorate([
@@ -45,6 +50,29 @@ let EducationItemResolver = class EducationItemResolver {
     async educationItems() {
         return await EducationItem_1.EducationItemModel.find();
     }
+    async createEducationItem(input, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
+        try {
+            return await EducationItem_1.EducationItemModel.create(Object.assign({ _id: (0, uuid_1.v4)() }, input));
+        }
+        catch (error) {
+            throw new Error("Failed to create education item");
+        }
+    }
+    async deleteEducationItem(_id, adminKey) {
+        if (!(0, isAuth_1.isAuth)(adminKey)) {
+            throw new Error("Not authorized");
+        }
+        try {
+            await EducationItem_1.EducationItemModel.deleteOne({ _id });
+            return true;
+        }
+        catch (error) {
+            throw new Error("Error deleting education item");
+        }
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [EducationItem_1.EducationItem]),
@@ -52,6 +80,22 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EducationItemResolver.prototype, "educationItems", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => EducationItem_1.EducationItem),
+    __param(0, (0, type_graphql_1.Arg)("input")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [EducationItemInput, String]),
+    __metadata("design:returntype", Promise)
+], EducationItemResolver.prototype, "createEducationItem", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)("_id")),
+    __param(1, (0, type_graphql_1.Arg)("adminKey")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], EducationItemResolver.prototype, "deleteEducationItem", null);
 EducationItemResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], EducationItemResolver);
