@@ -106,7 +106,7 @@ __decorate([
 ], UserResponse.prototype, "user", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => project_1.Project, { nullable: true }),
-    __metadata("design:type", project_1.Project)
+    __metadata("design:type", Object)
 ], UserResponse.prototype, "latestRelease", void 0);
 UserResponse = __decorate([
     (0, type_graphql_1.ObjectType)()
@@ -118,10 +118,11 @@ let UserResolver = class UserResolver {
             if (!user) {
                 throw new Error("Unable to find user");
             }
+            let latestRelease;
             const sortedProjects = await project_1.ProjectModel.find().sort({ createdAt: -1 });
-            const latestRelease = sortedProjects[0];
+            latestRelease = sortedProjects[0];
             if (!latestRelease) {
-                throw new Error("Unable to find latest release");
+                latestRelease = null;
             }
             return {
                 user,

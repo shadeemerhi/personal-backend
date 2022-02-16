@@ -77,7 +77,7 @@ class UserResponse {
   user?: User;
 
   @Field(() => Project, { nullable: true })
-  latestRelease?: Project;
+  latestRelease?: Project | null;
 }
 
 @Resolver()
@@ -90,11 +90,13 @@ export class UserResolver {
       if (!user) {
         throw new Error("Unable to find user");
       }
+
+      let latestRelease;
       const sortedProjects = await ProjectModel.find().sort({ createdAt: -1 });
-      const latestRelease = sortedProjects[0];
+      latestRelease = sortedProjects[0];
 
       if (!latestRelease) {
-        throw new Error("Unable to find latest release");
+        latestRelease = null;
       }
 
       return {
