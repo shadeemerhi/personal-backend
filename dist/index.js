@@ -18,7 +18,7 @@ const educationItem_1 = require("./resolvers/educationItem");
 const main = async () => {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
-        origin: process.env.CORS_ORIGIN,
+        origin: true,
         credentials: true,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
