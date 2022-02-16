@@ -16,7 +16,6 @@ import { EducationItemResolver } from "./resolvers/educationItem";
 const main = async () => {
   const app = express();
 
-  // domain is cors origin
   app.use(
     cors({
       // origin: process.env.CORS_ORIGIN,
