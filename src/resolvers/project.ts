@@ -74,7 +74,7 @@ export class ProjectResolver {
 
   @Query(() => [Project])
   async projects(): Promise<Project[] | null> {
-    return await ProjectModel.find();
+    return await ProjectModel.find().sort({ createdAt: -1 });
   }
 
   @Mutation(() => Project)

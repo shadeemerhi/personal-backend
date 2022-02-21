@@ -106,7 +106,7 @@ let ProjectResolver = class ProjectResolver {
         return await project_1.ProjectModel.findOne({ id });
     }
     async projects() {
-        return await project_1.ProjectModel.find();
+        return await project_1.ProjectModel.find().sort({ createdAt: -1 });
     }
     async createProject(input, adminKey) {
         const { title, description, photoFile, startDate, stack, endDate, inProgress, repositoryLinks, } = input;
